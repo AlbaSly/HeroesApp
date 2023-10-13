@@ -14,11 +14,12 @@ import { ConfirmDialogComponent } from '../../componentes/confirm-dialog/confirm
   styleUrls: ['./new-page.component.scss'],
 })
 export class NewPageComponent implements OnInit {
-  
   public heroForm = new FormGroup({
     id: new FormControl(''),
     superhero: new FormControl(''),
-    publisher: new FormControl<Publisher>(Publisher.MarvelComics, {nonNullable: true}),
+    publisher: new FormControl<Publisher>(Publisher.MarvelComics, {
+      nonNullable: true,
+    }),
     alter_ego: new FormControl(''),
     first_appearance: new FormControl(''),
     characters: new FormControl(''),
@@ -41,14 +42,14 @@ export class NewPageComponent implements OnInit {
     private readonly _activatedRoute: ActivatedRoute,
     private readonly _materialSnackbar: MatSnackBar,
     private readonly _heroesService: HeroesService,
-    private readonly _materialDialog: MatDialog,
-    ) {}
+    private readonly _materialDialog: MatDialog
+  ) {}
 
   ngOnInit(): void {
     if (!this._router.url.includes('edit')) return;
 
     this._activatedRoute.params
-      .pipe(switchMap(({id}) => this._heroesService.getHeroById(id)))
+      .pipe(switchMap(({ id }) => this._heroesService.getHeroById(id)))
       .subscribe((hero) => {
         if (!hero) return this._router.navigateByUrl('/');
 
@@ -67,12 +68,12 @@ export class NewPageComponent implements OnInit {
     if (this.heroForm.invalid) return;
 
     if (this.currentHero.id) {
-      this._heroesService.updateHero(this.currentHero).subscribe(hero => {
+      this._heroesService.updateHero(this.currentHero).subscribe((hero) => {
         this.showSnackbar(`El héroe ${hero.superhero} ha sido modificado`);
       });
     } else {
-      this._heroesService.addHero(this.currentHero).subscribe(hero => {
-        this._router.navigate(['/heroes/edit', hero.id])
+      this._heroesService.addHero(this.currentHero).subscribe((hero) => {
+        this._router.navigate(['/heroes/edit', hero.id]);
         this.showSnackbar(`El héroe ${hero.superhero} ha sido creado`);
       });
     }
@@ -81,9 +82,12 @@ export class NewPageComponent implements OnInit {
   onDeleteHero(): void {
     if (!this.currentHero.id) return;
 
-    const dialogRef = this._materialDialog.open(ConfirmDialogComponent, {data: this.currentHero});
+    const dialogRef = this._materialDialog.open(ConfirmDialogComponent, {
+      data: this.currentHero,
+    });
 
-    dialogRef.afterClosed()
+    dialogRef
+      .afterClosed()
       .pipe(
         /**
          * Filtro que deja pasar solamente si el dialog fue hecho click en si (que sea true)
@@ -93,12 +97,14 @@ export class NewPageComponent implements OnInit {
         /**
          * Ahora realizamos la llamada al servicio
          */
-        switchMap(() => this._heroesService.deleteHeroById(this.currentHero.id)),
+        switchMap(() =>
+          this._heroesService.deleteHeroById(this.currentHero.id)
+        ),
         /**Finalmente, dentro del servicio si el booleano da true (se eliminó), dejar pasar al subscribe */
         filter((wasDeleted: boolean) => wasDeleted)
       )
-      .subscribe(result => {
-        this.showSnackbar("El héroe ha sido borrado");
+      .subscribe((result) => {
+        this.showSnackbar('El héroe ha sido borrado');
         this._router.navigate(['/heroes']);
       });
   }
