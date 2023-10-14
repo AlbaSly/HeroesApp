@@ -1,4 +1,7 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+import { IUser } from 'src/app/auth/interfaces';
+import { AuthService } from 'src/app/auth/services/auth.service';
 
 @Component({
   selector: 'app-heroes-layout',
@@ -18,4 +21,18 @@ export class HeroesLayoutComponent {
       label: 'Buscar', icon: 'search', url: './search'
     }
   ]
+
+  constructor(
+    private readonly _router: Router,
+    private readonly _authService: AuthService,
+  ) {}
+
+  get user(): IUser | undefined {
+    return this._authService.currentUser;
+  }
+
+  logout(): void {
+    this._authService.logout();
+    this._router.navigate(['/auth']);
+  }
 }
